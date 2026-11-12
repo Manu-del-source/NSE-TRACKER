@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Activity, Bell, Building2, ChartNoAxesCombined, Eye, LayoutDashboard, Users, Wallet, ShieldCheck, Bookmark, ArrowLeft, Search } from "lucide-react";
+import { Activity, Bell, Building2, TrendingUp, Eye, LayoutDashboard, Users, Wallet, ShieldCheck, Bookmark, ArrowLeft, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
 const nav = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/market", label: "Market", icon: Activity },
-  { href: "/stocks", label: "Stocks", icon: ChartNoAxesCombined },
+  { href: "/stocks", label: "Stocks", icon: TrendingUp },
   { href: "/investors", label: "Investors", icon: Users },
   { href: "/institutions", label: "Institutions", icon: Building2 },
   { href: "/ownership", label: "Ownership changes", icon: Eye },
@@ -29,6 +29,7 @@ export function SectionLayout({ title, description, children }: { title: string;
         <div className="flex items-center gap-2 text-xs text-slate-500"><Link href="/" className="hover:text-gold">Overview</Link><span>/</span><span className="text-slate-200">{title}</span></div>
         <div className="flex items-center gap-3"><div className="hidden items-center gap-2 rounded-lg border border-line bg-panel px-3 py-2 text-[10px] text-slate-500 sm:flex"><Search size={13}/> Search NSE Tracker</div><span className="rounded border border-line px-2 py-1 text-[9px] tracking-wider text-gold">DEMO DATA</span></div>
       </header>
+      <nav className="scrollbar-none flex gap-1 overflow-x-auto border-b border-line px-3 py-2 lg:hidden">{nav.map(({href,label})=><Link key={href} href={href} className="shrink-0 rounded-md px-3 py-2 text-[10px] text-slate-400 hover:bg-white/5 hover:text-gold">{label}</Link>)}</nav>
       <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-7 sm:py-8">
         <div className="mb-6"><div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-gold">Nairobi Securities Exchange</div><h1 className="text-[26px] font-semibold tracking-tight text-white sm:text-[30px]">{title}</h1><p className="mt-1.5 text-xs text-slate-500">{description}</p></div>
         <div className="mb-5 rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 text-[11px] leading-5 text-amber-100/70"><strong className="text-amber-200">Illustrative preview.</strong> This page uses sample placeholder information only. It is not live market data, verified ownership information, or a record of actual trades.</div>
