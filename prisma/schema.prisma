@@ -283,6 +283,7 @@ model SourceDocument {
   shareholdingSnapshots  ShareholdingSnapshot[]
   ownershipEvents        OwnershipEvent[]
   insiderDisclosures     InsiderDisclosure[]
+  marketSignals          MarketSignal[]
 
   @@index([sourceType, publishedAt])
   @@index([publisher, documentDate])
