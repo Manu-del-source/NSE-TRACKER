@@ -98,7 +98,6 @@ model Company {
   insiderDisclosures  InsiderDisclosure[]
   marketSignals       MarketSignal[]
   watchlistEntries    WatchlistEntry[]
-  alertRules          AlertRule[]
 
   @@index([name])
   @@index([sector])
