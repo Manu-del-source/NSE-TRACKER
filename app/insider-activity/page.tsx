@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { SectionLayout, StatCards, DataTable } from "@/app/components/section-layout";
 import { getInsiderLedger } from "@/lib/market-data";
 
@@ -9,7 +10,7 @@ function formatDate(value: Date | null) {
 
 export default async function InsiderActivityPage() {
   const ledger = await getInsiderLedger();
-  const rows = ledger.events.map((event) => [
+  const rows = ledger.events.map((event: Prisma.InsiderDisclosureGetPayload<{ include: { company: true; person: true; sourceDocument: true } }>) => [
     event.company.symbol,
     event.person.displayName,
     event.transactionType,
