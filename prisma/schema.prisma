@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum CompanyStatus {
@@ -68,6 +69,14 @@ enum SignalMethod {
   RULE_BASED
   STATISTICAL
   MODEL_DERIVED
+}
+
+enum AlertRuleType {
+  PRICE_ABOVE
+  PRICE_BELOW
+  PRICE_CHANGE_PERCENT
+  OWNERSHIP_DISCLOSURE
+  INSIDER_DISCLOSURE
 }
 
 model Company {
@@ -321,4 +330,18 @@ model WatchlistEntry {
 
   @@unique([userId, companyId])
   @@index([userId, createdAt])
+}
+
+model AlertRule {
+  id          String         @id @default(cuid())
+  userId      String
+  ruleType    AlertRuleType
+  symbol      String?
+  threshold   Decimal?       @db.Decimal(12, 6)
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([userId, isActive, createdAt])
+  @@index([symbol, ruleType])
 }

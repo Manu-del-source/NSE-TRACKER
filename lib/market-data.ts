@@ -199,3 +199,47 @@ export async function getInsiderLedger() {
     return { databaseAvailable: false, events: [], totalCount: 0, issuerCount: 0, pendingCount: 0 };
   }
 }
+
+export async function getInvestorDirectory() {
+  try {
+    const [investors, totalCount] = await Promise.all([
+      prisma.investor.findMany({
+        orderBy: { displayName: "asc" },
+        take: 200,
+        include: {
+          institution: true,
+          ownershipEvents: { where: { verificationStatus: "VERIFIED" }, select: { id: true, company: { select: { symbol: true } } } },
+          insiderDisclosures: { where: { verificationStatus: "VERIFIED" }, select: { id: true } },
+        },
+      }),
+      prisma.investor.count(),
+    ]);
+    return { databaseAvailable: true, investors, totalCount };
+  } catch (error) {
+    console.error("Unable to load investor directory:", error);
+    return { databaseAvailable: false, investors: [], totalCount: 0 };
+  }
+}
+
+export async function getInstitutionDirectory() {
+  try {
+    const [institutions, totalCount] = await Promise.all([
+      prisma.institution.findMany({
+        orderBy: { legalName: "asc" },
+        take: 200,
+        include: {
+          investor: {
+            include: {
+              shareholdings: { where: { verificationStatus: "VERIFIED" }, include: { company: true, sourceDocument: true }, orderBy: { asOfDate: "desc" }, take: 10 },
+            },
+          },
+        },
+      }),
+      prisma.institution.count(),
+    ]);
+    return { databaseAvailable: true, institutions, totalCount };
+  } catch (error) {
+    console.error("Unable to load institution directory:", error);
+    return { databaseAvailable: false, institutions: [], totalCount: 0 };
+  }
+}
