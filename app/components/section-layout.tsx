@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UserButton, Show } from "@clerk/nextjs";
 import { Activity, Bell, Building2, TrendingUp, Eye, LayoutDashboard, Users, Wallet, ShieldCheck, Bookmark, ArrowLeft, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -27,7 +28,7 @@ export function SectionLayout({ title, description, children }: { title: string;
     <main className="min-h-screen lg:pl-[252px]">
       <header className="sticky top-0 z-20 flex h-[68px] items-center justify-between border-b border-line bg-ink/90 px-4 backdrop-blur sm:px-7">
         <div className="flex items-center gap-2 text-xs text-slate-500"><Link href="/" className="hover:text-gold">Overview</Link><span>/</span><span className="text-slate-200">{title}</span></div>
-        <div className="flex items-center gap-3"><div className="hidden items-center gap-2 rounded-lg border border-line bg-panel px-3 py-2 text-[10px] text-slate-500 sm:flex"><Search size={13}/> Search NSE Tracker</div><span className="rounded border border-line px-2 py-1 text-[9px] tracking-wider text-gold">DEMO DATA</span></div>
+        <div className="flex items-center gap-3"><div className="hidden items-center gap-2 rounded-lg border border-line bg-panel px-3 py-2 text-[10px] text-slate-500 sm:flex"><Search size={13}/> Search NSE Tracker</div><span className="rounded border border-line px-2 py-1 text-[9px] tracking-wider text-gold">DEMO DATA</span><Show when="signed-out"><Link href="/sign-in" className="text-xs text-slate-300 hover:text-gold">Sign in</Link><Link href="/sign-up" className="rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-ink hover:bg-amber-300">Create account</Link></Show><Show when="signed-in"><UserButton /></Show></div>
       </header>
       <nav className="scrollbar-none flex gap-1 overflow-x-auto border-b border-line px-3 py-2 lg:hidden">{nav.map(({href,label})=><Link key={href} href={href} className="shrink-0 rounded-md px-3 py-2 text-[10px] text-slate-400 hover:bg-white/5 hover:text-gold">{label}</Link>)}</nav>
       <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-7 sm:py-8">
