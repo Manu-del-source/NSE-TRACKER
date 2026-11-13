@@ -91,3 +91,59 @@ export async function getCompanyBySymbol(symbol: string) {
     return null;
   }
 }
+
+export async function getMarketOverview() {
+  try {
+    const [latestQuoteDate, indices] = await Promise.all([
+      prisma.marketQuote.findFirst({
+        orderBy: { tradingDate: "desc" },
+        select: { tradingDate: true },
+      }),
+      prisma.marketIndex.findMany({
+        orderBy: { code: "asc" },
+        include: {
+          observations: {
+            orderBy: { observationDate: "desc" },
+            take: 1,
+          },
+        },
+      }),
+    ]);
+
+    const totals = latestQuoteDate
+      ? await prisma.marketQuote.aggregate({
+          where: { tradingDate: latestQuoteDate.tradingDate },
+          _sum: { turnover: true, volume: true },
+          _count: { _all: true },
+        })
+      : null;
+
+    return {
+      databaseAvailable: true,
+      tradingDate: latestQuoteDate?.tradingDate ?? null,
+      quoteCount: totals?._count._all ?? 0,
+      turnover: totals?._sum.turnover?.toString() ?? null,
+      volume: totals?._sum.volume?.toString() ?? null,
+      indices: indices.map((index) => {
+        const observation = index.observations[0];
+        return {
+          code: index.code,
+          name: index.name,
+          observationDate: observation?.observationDate ?? null,
+          value: observation?.value.toString() ?? null,
+          changePercent: observation?.changePercent?.toString() ?? null,
+        };
+      }),
+    };
+  } catch (error) {
+    console.error("Unable to load NSE market overview:", error);
+    return {
+      databaseAvailable: false,
+      tradingDate: null,
+      quoteCount: 0,
+      turnover: null,
+      volume: null,
+      indices: [],
+    };
+  }
+}
