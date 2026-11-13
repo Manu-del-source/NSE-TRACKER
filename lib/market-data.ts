@@ -147,3 +147,55 @@ export async function getMarketOverview() {
     };
   }
 }
+
+export async function getOwnershipLedger() {
+  try {
+    const [events, verifiedCount, pendingCount, issuerGroups] = await Promise.all([
+      prisma.ownershipEvent.findMany({
+        where: { verificationStatus: "VERIFIED" },
+        orderBy: [{ effectiveDate: "desc" }, { disclosedAt: "desc" }],
+        take: 100,
+        include: { company: true, investor: true, sourceDocument: true },
+      }),
+      prisma.ownershipEvent.count({ where: { verificationStatus: "VERIFIED" } }),
+      prisma.ownershipEvent.count({
+        where: { verificationStatus: { in: ["PENDING", "NEEDS_REVIEW"] } },
+      }),
+      prisma.ownershipEvent.findMany({
+        where: { verificationStatus: "VERIFIED" },
+        distinct: ["companyId"],
+        select: { companyId: true },
+      }),
+    ]);
+    return { databaseAvailable: true, events, verifiedCount, pendingCount, issuerCount: issuerGroups.length };
+  } catch (error) {
+    console.error("Unable to load ownership ledger:", error);
+    return { databaseAvailable: false, events: [], verifiedCount: 0, pendingCount: 0, issuerCount: 0 };
+  }
+}
+
+export async function getInsiderLedger() {
+  try {
+    const [events, totalCount, issuerGroups, pendingCount] = await Promise.all([
+      prisma.insiderDisclosure.findMany({
+        where: { verificationStatus: "VERIFIED" },
+        orderBy: [{ transactionDate: "desc" }, { disclosedAt: "desc" }],
+        take: 100,
+        include: { company: true, person: true, sourceDocument: true },
+      }),
+      prisma.insiderDisclosure.count({ where: { verificationStatus: "VERIFIED" } }),
+      prisma.insiderDisclosure.findMany({
+        where: { verificationStatus: "VERIFIED" },
+        distinct: ["companyId"],
+        select: { companyId: true },
+      }),
+      prisma.insiderDisclosure.count({
+        where: { verificationStatus: { in: ["PENDING", "NEEDS_REVIEW"] } },
+      }),
+    ]);
+    return { databaseAvailable: true, events, totalCount, issuerCount: issuerGroups.length, pendingCount };
+  } catch (error) {
+    console.error("Unable to load insider ledger:", error);
+    return { databaseAvailable: false, events: [], totalCount: 0, issuerCount: 0, pendingCount: 0 };
+  }
+}
